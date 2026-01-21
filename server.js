@@ -18,8 +18,8 @@ app.use(session({
 }));
 
 /* ===== SIMPLE ADMIN CREDENTIALS ===== */
-const ADMIN_USER = "admin";
-const ADMIN_PASS = "1234";
+const ADMIN_USER = "HFLARMY";
+const ADMIN_PASS = "HFLSPEED@A12";
 
 /* ===== DATA PATH ===== */
 const dataDir = path.join(__dirname, "data");
