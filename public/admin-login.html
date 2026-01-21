@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Login - HFL ARMY</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <h1 class="title">ADMIN LOGIN</h1>
+
+  <form class="form" id="loginForm">
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button>Login</button>
+  </form>
+
+  <p id="error" style="color:red; margin-top:10px;"></p>
+</div>
+
+<script>
+document.getElementById("loginForm").onsubmit = async e => {
+  e.preventDefault();
+
+  const res = await fetch("/admin/login", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      username: username.value,
+      password: password.value
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    window.location.href = "/admin.html";
+  } else {
+    error.textContent = "Invalid credentials";
+  }
+};
+</script>
+
+</body>
+</html>

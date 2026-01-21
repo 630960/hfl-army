@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Duo Registration</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <h1 class="title">DUO REGISTRATION</h1>
+
+  <form class="form" id="duoForm">
+    <h3>Player 1</h3>
+    <input name="p1Name" placeholder="Player 1 Name" required>
+    <input name="p1Uid" placeholder="Player 1 UID" required>
+
+    <h3>Player 2</h3>
+    <input name="p2Name" placeholder="Player 2 Name" required>
+    <input name="p2Uid" placeholder="Player 2 UID" required>
+
+    <input name="teamName" placeholder="Team Name" required>
+    <input name="phone" placeholder="+91XXXXXXXXXX" required>
+    <input name="email" placeholder="Email ID" required>
+
+    <button>Register</button>
+  </form>
+</div>
+
+<div id="successPopup">Registration Successful ✅</div>
+
+<script>
+document.getElementById("duoForm").onsubmit = async e => {
+  e.preventDefault();
+  await fetch("/duo", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
+  });
+  successPopup.style.display="block";
+  setTimeout(()=>successPopup.style.display="none",3000);
+  e.target.reset();
+};
+</script>
+</body>
+</html>

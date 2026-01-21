@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel - HFL ARMY</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { background:#0f2027; color:white; font-family:Arial,sans-serif; }
+    .container { width: 95%; margin:auto; padding:20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #111; color: white; }
+    th, td { border: 1px solid #00ffcc; padding: 10px; text-align: left; }
+    th { background: #00ffcc; color: black; }
+    h1, h2 { color: #00ffcc; margin-top: 30px; }
+    button { cursor:pointer; margin-right:5px; padding:5px 10px; border:none; border-radius:5px; }
+    .edit-btn { background:orange; color:black; }
+    .delete-btn { background:red; color:white; }
+    .export-btn { margin-top:20px; padding:10px 15px; background:#00ffcc; color:black; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1 class="title">ADMIN PANEL</h1>
+
+  <!-- EXPORT TO EXCEL -->
+  <button class="export-btn" onclick="window.location.href='/admin/export'">
+    Download Excel
+  </button>
+
+  <!-- SOLO -->
+  <h2>SOLO REGISTRATIONS</h2>
+  <table id="soloTable">
+    <thead>
+      <tr>
+        <th>Player Name</th>
+        <th>UID</th>
+        <th>Phone</th>
+        <th>Email</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- DUO -->
+  <h2>DUO REGISTRATIONS</h2>
+  <table id="duoTable">
+    <thead>
+      <tr>
+        <th>Player 1</th>
+        <th>UID 1</th>
+        <th>Player 2</th>
+        <th>UID 2</th>
+        <th>Team</th>
+        <th>Phone</th>
+        <th>Email</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- SQUAD -->
+  <h2>SQUAD REGISTRATIONS</h2>
+  <table id="squadTable">
+    <thead>
+      <tr>
+        <th>P1</th><th>UID1</th>
+        <th>P2</th><th>UID2</th>
+        <th>P3</th><th>UID3</th>
+        <th>P4</th><th>UID4</th>
+        <th>Team</th>
+        <th>Phone</th>
+        <th>Email</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+</div>
+
+<script>
+async function loadAdminData() {
+  try {
+    // SOLO
+    const solo = await fetch("/admin/solo").then(r => r.json());
+    const soloBody = document.querySelector("#soloTable tbody");
+    soloBody.innerHTML = "";
+    solo.forEach((p, index) => {
+      soloBody.innerHTML += `
+        <tr>
+          <td>${p.playerName}</td>
+          <td>${p.uid}</td>
+          <td>${p.phone}</td>
+          <td>${p.email}</td>
+          <td>
+            <button class="edit-btn" onclick="editEntry('solo', ${index})">Edit</button>
+            <button class="delete-btn" onclick="deleteEntry('solo', ${index})">Delete</button>
+          </td>
+        </tr>`;
+    });
+
+    // DUO
+    const duo = await fetch("/admin/duo").then(r => r.json());
+    const duoBody = document.querySelector("#duoTable tbody");
+    duoBody.innerHTML = "";
+    duo.forEach((t, index) => {
+      duoBody.innerHTML += `
+        <tr>
+          <td>${t.p1Name}</td><td>${t.p1Uid}</td>
+          <td>${t.p2Name}</td><td>${t.p2Uid}</td>
+          <td>${t.teamName}</td>
+          <td>${t.phone}</td>
+          <td>${t.email}</td>
+          <td>
+            <button class="edit-btn" onclick="editEntry('duo', ${index})">Edit</button>
+            <button class="delete-btn" onclick="deleteEntry('duo', ${index})">Delete</button>
+          </td>
+        </tr>`;
+    });
+
+    // SQUAD
+    const squad = await fetch("/admin/squad").then(r => r.json());
+    const squadBody = document.querySelector("#squadTable tbody");
+    squadBody.innerHTML = "";
+    squad.forEach((t, index) => {
+      squadBody.innerHTML += `
+        <tr>
+          <td>${t.p1Name}</td><td>${t.p1Uid}</td>
+          <td>${t.p2Name}</td><td>${t.p2Uid}</td>
+          <td>${t.p3Name}</td><td>${t.p3Uid}</td>
+          <td>${t.p4Name}</td><td>${t.p4Uid}</td>
+          <td>${t.teamName}</td>
+          <td>${t.phone}</td>
+          <td>${t.email}</td>
+          <td>
+            <button class="edit-btn" onclick="editEntry('squad', ${index})">Edit</button>
+            <button class="delete-btn" onclick="deleteEntry('squad', ${index})">Delete</button>
+          </td>
+        </tr>`;
+    });
+
+  } catch(err) {
+    console.error("Error loading admin data:", err);
+  }
+}
+
+async function deleteEntry(type, index) {
+  if (!confirm("Are you sure you want to delete this entry?")) return;
+  const res = await fetch(`/admin/delete/${type}/${index}`, { method: "DELETE" });
+  const data = await res.json();
+  if (data.success) loadAdminData();
+  else alert("Error deleting entry");
+}
+
+async function editEntry(type, index) {
+  const tableData = await fetch(`/admin/${type}`).then(r => r.json());
+  const entry = tableData[index];
+  let updatedEntry;
+
+  if (type === "solo") {
+    const playerName = prompt("Player Name:", entry.playerName);
+    const uid = prompt("UID:", entry.uid);
+    const phone = prompt("Phone (+91):", entry.phone);
+    const email = prompt("Email:", entry.email);
+    updatedEntry = { playerName, uid, phone, email };
+  }
+  else if (type === "duo") {
+    const p1Name = prompt("Player 1 Name:", entry.p1Name);
+    const p1Uid = prompt("Player 1 UID:", entry.p1Uid);
+    const p2Name = prompt("Player 2 Name:", entry.p2Name);
+    const p2Uid = prompt("Player 2 UID:", entry.p2Uid);
+    const teamName = prompt("Team Name:", entry.teamName);
+    const phone = prompt("Phone (+91):", entry.phone);
+    const email = prompt("Email:", entry.email);
+    updatedEntry = { p1Name, p1Uid, p2Name, p2Uid, teamName, phone, email };
+  }
+  else if (type === "squad") {
+    const p1Name = prompt("P1 Name:", entry.p1Name);
+    const p1Uid = prompt("P1 UID:", entry.p1Uid);
+    const p2Name = prompt("P2 Name:", entry.p2Name);
+    const p2Uid = prompt("P2 UID:", entry.p2Uid);
+    const p3Name = prompt("P3 Name:", entry.p3Name);
+    const p3Uid = prompt("P3 UID:", entry.p3Uid);
+    const p4Name = prompt("P4 Name:", entry.p4Name);
+    const p4Uid = prompt("P4 UID:", entry.p4Uid);
+    const teamName = prompt("Team Name:", entry.teamName);
+    const phone = prompt("Phone (+91):", entry.phone);
+    const email = prompt("Email:", entry.email);
+    updatedEntry = { p1Name,p1Uid,p2Name,p2Uid,p3Name,p3Uid,p4Name,p4Uid,teamName,phone,email };
+  }
+
+  const res = await fetch(`/admin/edit/${type}/${index}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updatedEntry)
+  });
+  const data = await res.json();
+  if (data.success) loadAdminData();
+  else alert("Error updating entry");
+}
+
+loadAdminData();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Solo Registration</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <h1 class="title">SOLO REGISTRATION</h1>
+
+  <form class="form" id="soloForm">
+    <input name="playerName" placeholder="Player Name" required>
+    <input name="uid" placeholder="Free Fire UID" required>
+    <input name="phone" placeholder="+91XXXXXXXXXX" required>
+    <input name="email" placeholder="Email ID" required>
+    <button>Register</button>
+  </form>
+</div>
+
+<div id="successPopup">Registration Successful ✅</div>
+
+<script>
+document.getElementById("soloForm").onsubmit = async e => {
+  e.preventDefault();
+  await fetch("/solo", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
+  });
+  successPopup.style.display="block";
+  setTimeout(()=>successPopup.style.display="none",3000);
+  e.target.reset();
+};
+</script>
+</body>
+</html>
